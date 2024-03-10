@@ -91,19 +91,18 @@ void PlayerEE::game_attempt(GameTable& table,
         choice_is_wrong = check_choise(choice, table.items_on_table(), MAX_PICK, MIN_PICK);
     } while (choice_is_wrong);
     table.pick_some_items(choice);
-    std::cout << name() << " take " << choice << " items" << "\n" << std::endl;
+    // std::cout << name() << " take " << choice << " items" << "\n" << std::endl;
+};
+void PlayerEE::save() {
+    EE.save_memory_to_file();
+};
+void PlayerEE::load(std::string& filename) {
+    EE.load_memory_from_file(filename);
 };
 
-int main() {
-    std::size_t ITEMS = 11;
-    std::size_t MAX_PICK = 2;
-    std::size_t MIN_PICK = 1;
-    
-    GameTable table{ITEMS, MAX_PICK};
-    
-    Player player1;    
-    PlayerEE player2{ITEMS, MAX_PICK};
-    
+template <typename T, typename B>
+extern void play_nim_game(GameTable& table, T& player1, B& player2,
+                   std::size_t ITEMS, std::size_t MAX_PICK, std::size_t MIN_PICK) {
     std::size_t player1_wins = 0;
     std::size_t player2_wins = 0;
     
@@ -148,11 +147,54 @@ int main() {
             }
         }
         table.reset_table();
+        if (round_count % 80 == 0) {
         std::cout << std::endl;
         std::cout << "Total rounds " << round_count << std::endl;
-        std::cout << "player1 wins: " << player1_wins << std::endl;
-        std::cout << "player2 wins: " << player2_wins << std::endl;
+        std::cout << player1.name() << " wins: " << player1_wins << std::endl;
+        std::cout << player2.name() << " wins: " << player2_wins << std::endl;
         std::cout << std::endl;
+
+
+        // std::cout << "==================================" << std::endl;
+        // player1.print_mem();
+        // std::cout << "==================================" << std::endl;
+        // player2.print_mem();
+        // std::cout << "==================================" << std::endl;
+        // player1.save();
+        break;
+        std::string a;
+        std::cin >> a;
+        }
     }
+}
+
+int main() {
+    std::size_t ITEMS = 11;
+    std::size_t MAX_PICK = 2;
+    std::size_t MIN_PICK = 1;
+    
+    GameTable table{ITEMS, MAX_PICK};
+    
+    // Player player1;    
+    PlayerEE player1{ITEMS, MAX_PICK};
+    // player1.save();
+    std::string file = "ee_memory11";
+    // player1.load(file);
+    // player1.print_mem();
+
+    PlayerEE player2{ITEMS, MAX_PICK};
+    // Player player2;
+
+    std::cout << "==================================" << std::endl;
+    player2.print_mem();
+    std::cout << "==================================" << std::endl;
+
+    play_nim_game(table, player1, player2, ITEMS, MAX_PICK, MIN_PICK);
+    
+    std::cout << "==================================" << std::endl;
+    player2.print_mem();
+    std::cout << "==================================" << std::endl;
+    
+
     return 0;
 }

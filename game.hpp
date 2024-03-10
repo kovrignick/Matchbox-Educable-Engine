@@ -40,4 +40,6 @@ public:
     void lose();
     void print_mem();
     void game_attempt(GameTable&, std::size_t, std::size_t);
+    void save();
+    void load(std::string&);
 };

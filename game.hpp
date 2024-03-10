@@ -19,27 +19,48 @@ public:
 bool check_choise(std::size_t, std::size_t, std::size_t, std::size_t);
 
 class Player {
+private:
+    std::string player_name;
 public:
-    std::string name();
-    std::size_t items_to_take(std::size_t);
-    void win();
-    void lose();
-    void game_attempt(GameTable&, std::size_t, std::size_t);
+    Player(std::string name) : player_name(name) {}
+    std::string name() { return player_name; }
+    virtual std::size_t choose_items_to_take(std::size_t) = 0;
+    virtual void game_attempt(GameTable&, std::size_t, std::size_t) = 0;
+    virtual void win() = 0;
+    virtual void lose() = 0;
 };
 
-class PlayerEE {
+class PlayerHuman : public Player {
+public:
+    PlayerHuman(std::string name = "Human")
+        : Player{name} {}
+
+    std::size_t choose_items_to_take(std::size_t) override;
+
+    void game_attempt(GameTable&, std::size_t, std::size_t) override;
+
+    void win() override;
+
+    void lose() override;
+};
+
+class PlayerComputer : public Player  {
 private:
     EducableEngine EE;
 public:
-    PlayerEE() = delete;
-    PlayerEE(std::size_t, std::size_t);
+    PlayerComputer() = delete;
+    PlayerComputer(std::size_t, std::size_t, std::string);
 
-    std::string name();
-    std::size_t items_to_take(std::size_t items_on_table);
-    void win();
-    void lose();
-    void print_mem();
-    void game_attempt(GameTable&, std::size_t, std::size_t);
+    std::size_t choose_items_to_take(std::size_t items_on_table) override;
+
+    void game_attempt(GameTable&, std::size_t, std::size_t) override;
+
+    void win() override;
+
+    void lose() override;
+
+    void print_memory();
+
     void save();
     void load(std::string&);
 };

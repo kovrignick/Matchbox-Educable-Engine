@@ -18,12 +18,10 @@ void GameTable::print_table() {
         std::cout << " |";
         if (i > 9) { std::cout << " "; }
         if (i > 99) { std::cout << "  "; }
-        if (i % 25 == 0) { std::cout << std::endl; }
     }
     std::cout << std::endl;
     for (std::size_t i = 1; i <= items_; ++i) { 
         std::cout << " " << i;
-        if (i % 25 == 0) { std::cout << std::endl; }
     }
     std::cout << std::endl << std::endl;
 }
@@ -42,66 +40,70 @@ bool check_choise(std::size_t choice, std::size_t on_table, std::size_t max, std
     return result;
 }
 
-std::string Player::name() { return "Human"; };
-std::size_t Player::items_to_take(std::size_t items_on_table) {
+std::size_t PlayerHuman::choose_items_to_take(std::size_t items_on_table) {
     std::cout << "Enter how many items do you want to take: ";
     std::size_t item;
     std::cin >> item;
     return item;
-};
-void Player::win() {
-    std::cout << "The Human brain won this round." << std::endl;
-};
-void Player::lose() {
-    std::cout << "The Computer won!" << std::endl;
-};
-void Player::game_attempt(GameTable& table, 
-                    std::size_t MAX_PICK, std::size_t MIN_PICK) {
+}
+
+void PlayerHuman::game_attempt(GameTable& table, std::size_t MAX_PICK, std::size_t MIN_PICK) {
     std::size_t choice;
     bool choice_is_wrong;
     do {
-        choice = this->items_to_take(table.items_on_table());
+        choice = this->choose_items_to_take(table.items_on_table());
         choice_is_wrong = check_choise(choice, table.items_on_table(), MAX_PICK, MIN_PICK);
     } while (choice_is_wrong);
     table.pick_some_items(choice);
     std::cout << name() << " take " << choice << " items" << "\n" << std::endl;
-};
+}
 
-PlayerEE::PlayerEE(std::size_t i, std::size_t p) : EE{i, p} {};
+void PlayerHuman::win() {
+    std::cout << "The " << name() << " brain won this round." << std::endl;
+}
 
-std::string PlayerEE::name() { return "EE"; };
-std::size_t PlayerEE::items_to_take(std::size_t items_on_table) {
+void PlayerHuman::lose() {
+    std::cout << name() << ", you lost in this round." << std::endl;
+}
+
+PlayerComputer::PlayerComputer(std::size_t i, std::size_t p, std::string name = "EE") 
+    : Player{name}, EE{i, p} {};
+
+std::size_t PlayerComputer::choose_items_to_take(std::size_t items_on_table) {
     return EE.make_choice(items_on_table);
-};
-void PlayerEE::win() {
-    EE.save_temporary_to_permanent();
-};
-void PlayerEE::lose() {
-    EE.forget_choises_forever();
-};
-void PlayerEE::print_mem() {
-    EE.print_permanent_memory();
-};
-void PlayerEE::game_attempt(GameTable& table, 
-                    std::size_t MAX_PICK, std::size_t MIN_PICK) {
+}
+
+void PlayerComputer::game_attempt(GameTable& table, std::size_t MAX_PICK, std::size_t MIN_PICK) {
     std::size_t choice;
     bool choice_is_wrong;
     do {
-        choice = items_to_take(table.items_on_table());
+        choice = choose_items_to_take(table.items_on_table());
         choice_is_wrong = check_choise(choice, table.items_on_table(), MAX_PICK, MIN_PICK);
     } while (choice_is_wrong);
     table.pick_some_items(choice);
-    // std::cout << name() << " take " << choice << " items" << "\n" << std::endl;
-};
-void PlayerEE::save() {
+}
+
+void PlayerComputer::win() {
+    EE.save_temporary_to_permanent();
+}
+
+void PlayerComputer::lose() {
+    EE.forget_choises_forever();
+}
+
+void PlayerComputer::print_memory() {
+    EE.print_permanent_memory();
+}
+
+void PlayerComputer::save() {
     EE.save_memory_to_file();
-};
-void PlayerEE::load(std::string& filename) {
+}
+void PlayerComputer::load(std::string& filename) {
     EE.load_memory_from_file(filename);
-};
+}
 
 template <typename T, typename B>
-extern void play_nim_game(GameTable& table, T& player1, B& player2,
+void play_nim_game(GameTable& table, T& player1, B& player2,
                    std::size_t ITEMS, std::size_t MAX_PICK, std::size_t MIN_PICK) {
     std::size_t player1_wins = 0;
     std::size_t player2_wins = 0;
@@ -147,25 +149,12 @@ extern void play_nim_game(GameTable& table, T& player1, B& player2,
             }
         }
         table.reset_table();
-        if (round_count % 80 == 0) {
-        std::cout << std::endl;
-        std::cout << "Total rounds " << round_count << std::endl;
-        std::cout << player1.name() << " wins: " << player1_wins << std::endl;
-        std::cout << player2.name() << " wins: " << player2_wins << std::endl;
-        std::cout << std::endl;
-
-
-        // std::cout << "==================================" << std::endl;
-        // player1.print_mem();
-        // std::cout << "==================================" << std::endl;
-        // player2.print_mem();
-        // std::cout << "==================================" << std::endl;
-        // player1.save();
-        break;
-        std::string a;
-        std::cin >> a;
-        }
     }
+    std::cout << std::endl;
+    std::cout << "Total rounds " << round_count << std::endl;
+    std::cout << player1.name() << " wins: " << player1_wins << std::endl;
+    std::cout << player2.name() << " wins: " << player2_wins << std::endl;
+    std::cout << std::endl;
 }
 
 int main() {
@@ -174,27 +163,11 @@ int main() {
     std::size_t MIN_PICK = 1;
     
     GameTable table{ITEMS, MAX_PICK};
-    
-    // Player player1;    
-    PlayerEE player1{ITEMS, MAX_PICK};
-    // player1.save();
-    std::string file = "ee_memory11";
-    // player1.load(file);
-    // player1.print_mem();
 
-    PlayerEE player2{ITEMS, MAX_PICK};
-    // Player player2;
-
-    std::cout << "==================================" << std::endl;
-    player2.print_mem();
-    std::cout << "==================================" << std::endl;
+    PlayerHuman player1;
+    PlayerComputer player2{ITEMS, MAX_PICK};
 
     play_nim_game(table, player1, player2, ITEMS, MAX_PICK, MIN_PICK);
-    
-    std::cout << "==================================" << std::endl;
-    player2.print_mem();
-    std::cout << "==================================" << std::endl;
-    
 
     return 0;
 }

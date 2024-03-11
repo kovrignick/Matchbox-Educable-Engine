@@ -5,9 +5,9 @@ GameTable2Player::GameTable2Player(std::size_t i, std::size_t p)
     : items_{i}
     , items_backup{i}
     , max_pick_{p} {}
-    
+
 std::size_t GameTable2Player::items_on_table() { return items_; }
-    
+
 void GameTable2Player::pick_some_items(std::size_t how_many_items) {
     if (how_many_items > items_) { throw std::logic_error("ItemsError"); };
     items_ -= how_many_items;
@@ -117,14 +117,14 @@ void PlayerComputer::load(std::string& filename) {
     EE.load_memory_from_file(filename);
 }
 
-template <typename T, typename B>
-void play_nim_game(GameTable2Player& table, T& player1, B& player2,
-                   std::size_t ITEMS, std::size_t MAX_PICK, std::size_t MIN_PICK) {
+void play_nim_game(GameTable2Player& table, Player& player1, Player& player2,
+                   std::size_t ITEMS, std::size_t MAX_PICK, 
+                   std::size_t MIN_PICK = 1, std::size_t last_round = 0) {
     for (;;) {
         table.next_round();
         std::cout << "Start round #" << table.round_count() << "\n" << std::endl;
         for (;;) {
-            table.print_table();
+            if (last_round == 0) { table.print_table(); }
             if (table.round_count() % 2 == 0) {
                 player1.game_attempt(table, MAX_PICK, MIN_PICK);
                 if (table.table_is_empty()) {
@@ -133,7 +133,7 @@ void play_nim_game(GameTable2Player& table, T& player1, B& player2,
                     player2.lose();
                     break;
                 }
-                table.print_table();
+                if (last_round == 0) { table.print_table(); }
                 player2.game_attempt(table, MAX_PICK, MIN_PICK);
                 if (table.table_is_empty()) {
                     table.player2_win();
@@ -149,7 +149,7 @@ void play_nim_game(GameTable2Player& table, T& player1, B& player2,
                     player1.lose();
                     break;
                 }
-                table.print_table();
+                if (last_round == 0) { table.print_table(); }
                 player1.game_attempt(table, MAX_PICK, MIN_PICK);
                 if (table.table_is_empty()) {
                     table.player1_win();
@@ -159,21 +159,43 @@ void play_nim_game(GameTable2Player& table, T& player1, B& player2,
                 }
             }
         }
-        table.reset_table();
+        if (table.round_count() == last_round) { break; }
     }
 }
 
 int main() {
     std::size_t ITEMS = 11;
     std::size_t MAX_PICK = 2;
-    std::size_t MIN_PICK = 1;
     
     GameTable2Player table{ITEMS, MAX_PICK};
 
-    PlayerHuman player1;
-    PlayerComputer player2{ITEMS, MAX_PICK};
+    PlayerHuman pl1;
+    PlayerComputer pl2{ITEMS, MAX_PICK};
 
-    play_nim_game(table, player1, player2, ITEMS, MAX_PICK, MIN_PICK);
+    // Greeting
+    // Welcome to the game "Bashe" (a special case nim game - https://en.wikipedia.org/wiki/Nim )
+
+    // Rules
+    // The rules of the game:
+    // - there are [N] items on the table;
+    // - two players take turns taking from 1 to M items from the table;
+    // - the one who has nothing to take from the table has lost.
+
+    // Game Settings
+    // Enter the number of items that will be on the table [N] =
+    // Enter the number of maximum items a player can take per turn [M] =
+
+    // Choose the game mode:
+    // Human vs Computer
+    // Human vs Human
+    // Computer vs Computer
+
+    // Enter the name of player #1
+    // Enter the name of player #2
+
+    // How many rounds will the computers play?
+
+    play_nim_game(table, pl1, pl2, ITEMS, MAX_PICK);
 
     return 0;
 }

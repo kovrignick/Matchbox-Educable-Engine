@@ -163,27 +163,55 @@ void play_nim_game(GameTable2Player& table, Player& player1, Player& player2,
     }
 }
 
+void greeting() {
+    std::cout << "Welcome to the game \"Bashe\" (a special case nim game - https://en.wikipedia.org/wiki/Nim )\n" << std::endl;
+}
+
+void game_rules() {
+    std::cout << "The rules of the game:" << std::endl;
+    std::cout << "- there are [N] items on the table;" << std::endl;
+    std::cout << "- two players take turns taking from 1 to M items from the table;" << std::endl;
+    std::cout << "- the one who has nothing to take from the table has lost.\n" << std::endl;
+}
+
+std::size_t set_items_quantity() {
+    std::size_t quantity;
+    while (true) {
+        std::cout << "Enter the number of items that will be on the table [N] = ";
+        std::cin >> quantity;
+        if ( quantity > 0 && quantity < 1000 ) { break; }
+        else { std::cout << "Value must be greater than 0 and less than 1000\n"; }
+    }
+    return quantity;
+}
+
+std::size_t set_max_pick(const std::size_t& items) {
+    std::size_t max_pick;
+    while (true) {
+        std::cout << "Enter the number of maximum items a player can take per turn [M] = ";
+        std::cin >> max_pick;
+        if ( max_pick > 0 && max_pick < items ) { break; }
+        else { std::cout << "Value must be greater than 0 and less than items (" << items << ")\n"; }
+    }
+    return max_pick;
+
+}
+
+int select_game_mode() {
+    int mode = 0;
+    return mode;
+}
+
 int main() {
-    std::size_t ITEMS = 11;
-    std::size_t MAX_PICK = 2;
+    greeting();
+    game_rules();
+    std::size_t ITEMS = set_items_quantity();
+    std::size_t MAX_PICK = set_max_pick(ITEMS);
     
     GameTable2Player table{ITEMS, MAX_PICK};
 
     PlayerHuman pl1;
     PlayerComputer pl2{ITEMS, MAX_PICK};
-
-    // Greeting
-    // Welcome to the game "Bashe" (a special case nim game - https://en.wikipedia.org/wiki/Nim )
-
-    // Rules
-    // The rules of the game:
-    // - there are [N] items on the table;
-    // - two players take turns taking from 1 to M items from the table;
-    // - the one who has nothing to take from the table has lost.
-
-    // Game Settings
-    // Enter the number of items that will be on the table [N] =
-    // Enter the number of maximum items a player can take per turn [M] =
 
     // Choose the game mode:
     // Human vs Computer

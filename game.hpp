@@ -1,4 +1,4 @@
-#include <signal.h>
+#include <csignal>
 #include "educable_engine.hpp"
 
 class GameTable2Player {

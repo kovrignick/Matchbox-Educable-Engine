@@ -47,6 +47,13 @@ std::size_t GameTable2Player::player2_win_count() { return player2_wins; }
 
 std::size_t GameTable2Player::round_count() { return round_number; }
 
+void GameTable2Player::show_game_result() { 
+    std::cout << "\nTotal rounds - " << round_count();
+    std::cout << "\nPlayer1 wins: " << player1_win_count();
+    std::cout << "\nPlayer2 wins: " << player2_win_count() << std::endl;
+    std::cout << std::endl;
+}
+
 bool check_choise(std::size_t choice, std::size_t on_table, std::size_t max, std::size_t min) {
     bool result = false;
     if (choice > on_table) { result = true; }
@@ -117,52 +124,6 @@ void PlayerComputer::load(std::string& filename) {
     EE.load_memory_from_file(filename);
 }
 
-void play_nim_game(GameTable2Player& table, Player& player1, Player& player2,
-                   std::size_t ITEMS, std::size_t MAX_PICK, 
-                   std::size_t MIN_PICK = 1, std::size_t last_round = 0) {
-    for (;;) {
-        table.next_round();
-        std::cout << "Start round #" << table.round_count() << "\n" << std::endl;
-        for (;;) {
-            if (last_round == 0) { table.print_table(); }
-            if (table.round_count() % 2 == 0) {
-                player1.game_attempt(table, MAX_PICK, MIN_PICK);
-                if (table.table_is_empty()) {
-                    table.player1_win();
-                    player1.win();
-                    player2.lose();
-                    break;
-                }
-                if (last_round == 0) { table.print_table(); }
-                player2.game_attempt(table, MAX_PICK, MIN_PICK);
-                if (table.table_is_empty()) {
-                    table.player2_win();
-                    player2.win();
-                    player1.lose();
-                    break;
-                }
-            } else {
-                player2.game_attempt(table, MAX_PICK, MIN_PICK);
-                if (table.table_is_empty()) {
-                    table.player2_win();
-                    player2.win();
-                    player1.lose();
-                    break;
-                }
-                if (last_round == 0) { table.print_table(); }
-                player1.game_attempt(table, MAX_PICK, MIN_PICK);
-                if (table.table_is_empty()) {
-                    table.player1_win();
-                    player1.win();
-                    player2.lose();
-                    break;
-                }
-            }
-        }
-        if (table.round_count() == last_round) { break; }
-    }
-}
-
 void greeting() {
     std::cout << "Welcome to the game \"Bashe\" (a special case nim game - https://en.wikipedia.org/wiki/Nim )\n" << std::endl;
 }
@@ -199,31 +160,76 @@ std::size_t set_max_pick(const std::size_t& items) {
 
 int select_game_mode() {
     int mode = 0;
+    std::cout << "Choose the game mode:\n";
+    std::cout << "1 - Human vs Computer\n";
+    std::cout << "2 - Human vs Human\n";
+    std::cout << "3 - Computer vs Computer\n";
+    while (true) {
+        std::cout << "Enter the number of mode: ";
+        std::cin >> mode;
+        if ( mode > 0 && mode < 4 ) { break; }
+        else { std::cout << "Only 1, 2 or 3\n"; }
+    }
     return mode;
 }
 
-int main() {
-    greeting();
-    game_rules();
-    std::size_t ITEMS = set_items_quantity();
-    std::size_t MAX_PICK = set_max_pick(ITEMS);
-    
-    GameTable2Player table{ITEMS, MAX_PICK};
+// void show_game_result(GameTable2Player& table) {
+//     std::cout << "\nTotal rounds - "; table.round_count();
+//     std::cout << "\nPlayer1 wins: "; table.player1_win_count();
+//     std::cout << "\nPlayer2 wins: "; table.player2_win_count();
+//     std::cout << std::endl;
+// }
 
-    PlayerHuman pl1;
-    PlayerComputer pl2{ITEMS, MAX_PICK};
+void play_nim_game(GameTable2Player& table, Player& player1, Player& player2,
+                   std::size_t ITEMS, std::size_t MAX_PICK, 
+                   std::size_t last_round, std::size_t MIN_PICK) {
+    for (;;) {
+        table.next_round();
+        if (last_round == 0) {
+            std::cout << "Start round #" << table.round_count() << "\n" << std::endl;
+        }
+        for (;;) {
+            if (last_round == 0) { table.print_table(); }
+            if (table.round_count() % 2 == 0) {
+                player1.game_attempt(table, MAX_PICK, MIN_PICK);
+                if (table.table_is_empty()) {
+                    table.player1_win();
+                    player1.win();
+                    player2.lose();
+                    break;
+                }
+                if (last_round == 0) { table.print_table(); }
+                player2.game_attempt(table, MAX_PICK, MIN_PICK);
+                if (table.table_is_empty()) {
+                    table.player2_win();
+                    player2.win();
+                    player1.lose();
+                    break;
+                }
+            } else {
+                player2.game_attempt(table, MAX_PICK, MIN_PICK);
+                if (table.table_is_empty()) {
+                    table.player2_win();
+                    player2.win();
+                    player1.lose();
+                    break;
+                }
+                if (last_round == 0) { table.print_table(); }
+                player1.game_attempt(table, MAX_PICK, MIN_PICK);
+                if (table.table_is_empty()) {
+                    table.player1_win();
+                    player1.win();
+                    player2.lose();
+                    break;
+                }
+            }
+        }
+        if (table.round_count() > last_round) { table.show_game_result(); }
+        if (table.round_count() == last_round) { break; }
+    }
+}
 
-    // Choose the game mode:
-    // Human vs Computer
-    // Human vs Human
-    // Computer vs Computer
-
-    // Enter the name of player #1
-    // Enter the name of player #2
-
-    // How many rounds will the computers play?
-
-    play_nim_game(table, pl1, pl2, ITEMS, MAX_PICK);
-
-    return 0;
+void signal_callback_handler(int signum) {
+   std::cout << "\nCaught signal, exit game. " << std::endl;
+   exit(signum);
 }

@@ -1,3 +1,4 @@
+#include <signal.h>
 #include "educable_engine.hpp"
 
 class GameTable2Player {
@@ -24,6 +25,7 @@ public:
     std::size_t player1_win_count();
     std::size_t player2_win_count();
     std::size_t round_count();
+    void show_game_result();
 };
 
 bool check_choise(std::size_t, std::size_t, std::size_t, std::size_t);
@@ -74,3 +76,20 @@ public:
     void save();
     void load(std::string&);
 };
+
+
+void greeting();
+
+void game_rules();
+
+std::size_t set_items_quantity();
+
+std::size_t set_max_pick(const std::size_t&);
+
+int select_game_mode();
+
+void play_nim_game(GameTable2Player&, Player&, Player&,
+                   std::size_t, std::size_t, 
+                   std::size_t last_round = 0, std::size_t MIN_PICK = 1);
+
+void signal_callback_handler(int);

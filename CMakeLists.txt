@@ -5,7 +5,8 @@ project(educable_engine)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(game 
+add_executable(game
+               main.cpp
                game.cpp
                educable_engine.cpp)
 

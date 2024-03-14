@@ -173,13 +173,6 @@ int select_game_mode() {
     return mode;
 }
 
-// void show_game_result(GameTable2Player& table) {
-//     std::cout << "\nTotal rounds - "; table.round_count();
-//     std::cout << "\nPlayer1 wins: "; table.player1_win_count();
-//     std::cout << "\nPlayer2 wins: "; table.player2_win_count();
-//     std::cout << std::endl;
-// }
-
 void play_nim_game(GameTable2Player& table, Player& player1, Player& player2,
                    std::size_t ITEMS, std::size_t MAX_PICK, 
                    std::size_t last_round, std::size_t MIN_PICK) {
